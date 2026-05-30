@@ -42,6 +42,45 @@ def ambil_analisis_dari_db(db: Session = Depends(get_db)):
             "jumlah": item.jumlah,
             "harga": item.harga
         })
+        # --- ENDPOINT 3: UPDATE (MENGUBAH DATA TRANSAKSI BERDASARKAN ID) ---
+@app.put("/api/v1/transaksi/{transaksi_id}")
+def update_transaksi(transaksi_id: int, produk: str, kategori: str, jumlah: int, harga: int, tanggal: str, db: Session = Depends(get_db)):
+    # 1. Cari data di database yang ID-nya cocok
+    transaksi = db.query(models.TransaksiModel).filter(models.TransaksiModel.id == transaksi_id).first()
+    
+    # 2. Jika ID tidak ditemukan, keluarkan pesan error 404
+    if not transaksi:
+        raise HTTPException(status_code=404, detail="Data transaksi tidak ditemukan!")
+    
+    # 3. Timpa data lama dengan data baru yang diinput user
+    transaksi.produk = produk
+    transaksi.kategori = kategori
+    transaksi.jumlah = jumlah
+    transaksi.harga = harga
+    transaksi.tanggal = tanggal
+    
+    # 4. Simpan perubahan ke database
+    db.commit()
+    db.refresh(transaksi)
+    
+    return {"status": "Sukses", "pesan": f"Transaksi ID {transaksi_id} berhasil diperbarui!"}
+
+
+# --- ENDPOINT 4: DELETE (MENGHAPUS DATA TRANSAKSI BERDASARKAN ID) ---
+@app.delete("/api/v1/transaksi/{transaksi_id}")
+def hapus_transaksi(transaksi_id: int, db: Session = Depends(get_db)):
+    # 1. Cari data di database yang ID-nya cocok
+    transaksi = db.query(models.TransaksiModel).filter(models.TransaksiModel.id == transaksi_id).first()
+    
+    # 2. Jika ID tidak ditemukan, keluarkan pesan error 404
+    if not transaksi:
+        raise HTTPException(status_code=404, detail="Data transaksi tidak ditemukan!")
+    
+    # 3. Hapus data tersebut dari database
+    db.delete(transaksi)
+    db.commit()
+    
+    return {"status": "Sukses", "pesan": f"Transaksi ID {transaksi_id} resmi dihapus dari database!"}
 
     # 3. Masukkan ke Pandas DataFrame untuk dihitung otomatis
     df = pd.DataFrame(data_list)
