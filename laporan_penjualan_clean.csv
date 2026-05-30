@@ -1,0 +1,7 @@
+id_transaksi,produk,kategori,jumlah,harga,tanggal,total_bayar
+1,Laptop Asus,Elektronik,1,12000000,2026-05-28,12000000
+2,Mouse Wireless,Elektronik,2,150000,2026-05-28,300000
+3,Kemeja Hitam,Fashion,3,120000,2026-05-29,360000
+4,Kopi Susu,Kuliner,5,25000,2026-05-29,125000
+5,Laptop Asus,Elektronik,1,12000000,2026-05-30,12000000
+6,Sepatu Lari,Fashion,1,450000,2026-05-30,450000
