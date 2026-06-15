@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart-Sales Analytics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-analytics { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .navbar { box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-info" href="/">🚀 Smart-Sales v1.0</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="/"><i class="bi bi-house-door"></i> Dashboard Utama</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-info btn-sm px-3 mt-1 mt-lg-0" href="/docs" target="_blank">🔧 Kelola API (/docs)</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="fw-bold text-dark">Smart-Sales Dashboard</h1>
+                <p class="text-muted">Analisis data transaksi real-time terintegrasi Pandas & SQLite</p>
+            </div>
+            <button class="btn btn-primary px-4 py-2" onclick="loadDashboardData()">🔄 Refresh Data</button>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-analytics bg-white p-4">
+                    <span class="text-muted small text-uppercase fw-bold">Total Omzet</span>
+                    <h2 class="fw-bold text-success mt-2" id="total-omzet">Rp 0</h2>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-analytics bg-white p-4">
+                    <span class="text-muted small text-uppercase fw-bold">Total Transaksi</span>
+                    <h2 class="fw-bold text-primary mt-2" id="total-transaksi">0 Transaksi</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-analytics bg-white p-4">
+            <h5 class="fw-bold mb-4">Log Transaksi Terbaru</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama Produk</th>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                            <th>Harga Satuan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-transaksi">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/v1/analytics');
+                const result = await response.json();
+
+                if (result.sumber_data) {
+                    document.getElementById('total-omzet').innerText = `Rp ${result.data_summary.total_omzet_idr.toLocaleString('id-ID')}`;
+                    document.getElementById('total-transaksi').innerText = `${result.data_summary.total_transaksi_tercatat} Transaksi`;
+                    
+                    const tabel = document.getElementById('tabel-transaksi');
+                    tabel.innerHTML = '';
+                    
+                    result.detail_data.forEach(item => {
+                        tabel.innerHTML += `
+                            <tr>
+                                <td class="fw-bold">#${item.id}</td>
+                                <td>${item.produk}</td>
+                                <td><span class="badge bg-secondary">${item.kategori}</span></td>
+                                <td>${item.jumlah}</td>
+                                <td>Rp ${item.harga.toLocaleString('id-ID')}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error("Gagal memuat data dashboard:", error);
+            }
+        }
+
+        window.onload = loadDashboardData;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
